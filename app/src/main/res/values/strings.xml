@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Story App</string>
+    <string name="signup">Daftar</string>
+    <string name="login">Masuk</string>
+    <string name="message_welcome_page">Yuk, Bagikan pengalaman dan keseruan selama belajar di Dicoding!, kepada semua orang!</string>
+    <string name="title_welcome_page">Selamat datang di Story App!</string>
+    <string name="title_signup_page">Lengkapi data diri mu dulu, ya!</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="message_login_page">Masukkan dulu datamu ya</string>
+    <string name="title_login_page">Sudah siap untuk memulai berbagi cerita?</string>
+    <string name="name">Nama</string>
+    <string name="message_main_page">Selamat Belajar di Dicoding.</string>
+    <string name="greeting">Halo %1$s,</string>
+    <string name="logout">Keluar</string>
+    <string name="image">Image</string>
+    <string name="name_user">Kratos</string>
+    <string name="deskripsi">Deskripsi</string>
+    <string name="image_placeholder">Image Placeholder</string>
+    <string name="empty_image_warning">Error when uploading image</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="appwidget_text">Story Images</string>
+    <string name="empty_text">NO DATA</string>
+
+</resources>

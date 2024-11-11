@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ストーリーアプリ</string>
+    <string name="signup">登録</string>
+    <string name="login">ログイン</string>
+    <string name="message_welcome_page">Dicodingでの学びの体験や楽しさをみんなにシェアしましょう！</string>
+    <string name="title_welcome_page">ストーリーアプリへようこそ！</string>
+    <string name="title_signup_page">まずはプロフィールを入力してください！</string>
+    <string name="email">メールアドレス</string>
+    <string name="password">パスワード</string>
+    <string name="message_login_page">まずはデータを入力してください</string>
+    <string name="title_login_page">ストーリーを共有する準備はできましたか？</string>
+    <string name="name">名前</string>
+    <string name="message_main_page">Dicodingでの学習を楽しんでください。</string>
+    <string name="greeting">こんにちは %1$s さん、</string>
+    <string name="logout">ログアウト</string>
+    <string name="image">画像</string>
+    <string name="name_user">クレイトス</string>
+    <string name="deskripsi">説明</string>
+    <string name="image_placeholder">画像プレースホルダー</string>
+    <string name="empty_image_warning">画像のアップロード中にエラーが発生しました</string>
+    <string name="add_widget">ウィジェットを追加</string>
+    <string name="app_widget_description">これはアプリのウィジェットの説明です</string>
+    <string name="appwidget_text">ストーリー画像</string>
+    <string name="empty_text">データなし</string>
+</resources>

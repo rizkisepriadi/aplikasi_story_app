@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Story App</string>
+    <string name="signup">Sign Up</string>
+    <string name="login">Login</string>
+    <string name="message_welcome_page">Let\'s share your learning experiences and excitement at Dicoding with everyone!</string>
+    <string name="title_welcome_page">Welcome to the Story App!</string>
+    <string name="title_signup_page">Please complete your profile first!</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="message_login_page">Please enter your data first</string>
+    <string name="title_login_page">Ready to start sharing your stories?</string>
+    <string name="name">Name</string>
+    <string name="message_main_page">Enjoy Learning at Dicoding.</string>
+    <string name="greeting">Hello %1$s,</string>
+    <string name="logout">Logout</string>
+    <string name="image">Image</string>
+    <string name="name_user">Kratos</string>
+    <string name="deskripsi">Description</string>
+    <string name="image_placeholder">Image Placeholder</string>
+    <string name="empty_image_warning">Error when uploading image</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="appwidget_text">Story Images</string>
+    <string name="empty_text">NO DATA</string>
+</resources>
