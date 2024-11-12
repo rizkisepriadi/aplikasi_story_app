@@ -43,11 +43,6 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
     private val _isLoggedOut = MutableLiveData<Boolean>()
     val isLoggedOut: LiveData<Boolean> = _isLoggedOut
 
-
-    init {
-        listStoryEvents()
-    }
-
     fun register(name: String, email: String, password: String) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -64,7 +59,7 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
         }
     }
 
-    fun listStoryEvents() {
+    fun loadStories() {
         _isLoading.value = true
         viewModelScope.launch {
             val result = repository.getStories()

@@ -3,6 +3,7 @@ package com.dicoding.picodiploma.loginwithanimation.view.login
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.activity.viewModels
@@ -52,20 +53,26 @@ class LoginActivity : AppCompatActivity() {
     private fun observeViewModel() {
         viewModel.isLoginSuccessful.observe(this) { isSuccessful ->
             if (isSuccessful) {
-                showSuccessDialog()
+                navigateToMain()
             }
         }
+
         viewModel.errorMessage.observe(this) { error ->
             error?.let {
                 showErrorDialog(it)
                 viewModel.clearErrorMessage()
             }
         }
+
+        viewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
     }
 
-    private fun showSuccessDialog() {
-        val intent = Intent(this@LoginActivity, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+    private fun navigateToMain() {
+        val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+        }
         startActivity(intent)
         finish()
     }
@@ -78,5 +85,9 @@ class LoginActivity : AppCompatActivity() {
             create()
             show()
         }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 }

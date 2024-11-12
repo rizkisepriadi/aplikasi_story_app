@@ -1,6 +1,7 @@
 package com.dicoding.picodiploma.loginwithanimation.view.detail
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -30,17 +31,18 @@ class DetailActivity : AppCompatActivity() {
             finish()
         }
 
-        binding.let {
-            mainViewModel.detailEvent.observe(this) { story ->
-                if (story != null) {
-                    binding.tvItemName.text = story.name
-                    binding.tvItemDescription.text = story.description
-                    Glide.with(this).load(story.photoUrl).into(binding.ivItemPhoto)
-                } else {
-                    Toast.makeText(this, "Failed to load story details", Toast.LENGTH_SHORT).show()
-                }
-            }
+        observeViewModel()
+    }
 
+    private fun observeViewModel() {
+        mainViewModel.detailEvent.observe(this) { story ->
+            if (story != null) {
+                binding.tvItemName.text = story.name
+                binding.tvItemDescription.text = story.description
+                Glide.with(this).load(story.photoUrl).into(binding.ivItemPhoto)
+            } else {
+                Toast.makeText(this, "Failed to load story details", Toast.LENGTH_SHORT).show()
+            }
         }
 
         mainViewModel.errorMessage.observe(this) { errorMessage ->
@@ -49,5 +51,13 @@ class DetailActivity : AppCompatActivity() {
                 mainViewModel.clearErrorMessage()
             }
         }
+
+        mainViewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 }

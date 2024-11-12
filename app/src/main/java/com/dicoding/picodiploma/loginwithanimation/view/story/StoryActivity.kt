@@ -9,10 +9,12 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityStoryBinding
 import com.dicoding.picodiploma.loginwithanimation.getImageUri
+import com.dicoding.picodiploma.loginwithanimation.reduceFileImage
 import com.dicoding.picodiploma.loginwithanimation.uriToFile
 import com.dicoding.picodiploma.loginwithanimation.view.main.MainActivity
 import com.dicoding.picodiploma.loginwithanimation.viewModel.MainViewModel
@@ -36,23 +38,42 @@ class StoryActivity : AppCompatActivity() {
         binding = ActivityStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        observeViewModel()
+        setupActions()
+    }
+
+    private fun observeViewModel() {
         mainViewModel.currentImageUri.observe(this) { uri ->
             if (uri != null) {
-                Log.d("Image URI", "showImage: $uri")
                 binding.rvImage.setImageURI(uri)
             }
         }
 
-        binding.let {
-            it.buttonGallery.setOnClickListener{
-                startGallery()
+        mainViewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
+
+        mainViewModel.errorMessage.observe(this) { errorMessage ->
+            if (errorMessage != null) {
+                showToast(errorMessage)
+                mainViewModel.clearErrorMessage()
             }
-            it.buttonCamera.setOnClickListener{
-                startCamera()
+        }
+
+        mainViewModel.isUploadSuccessful.observe(this) { isSuccessful ->
+            if (isSuccessful) {
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
             }
-            it.buttonAdd.setOnClickListener{
-                uploadImage()
-            }
+        }
+    }
+
+    private fun setupActions() {
+        binding.apply {
+            buttonGallery.setOnClickListener { startGallery() }
+            buttonCamera.setOnClickListener { startCamera() }
+            buttonAdd.setOnClickListener { uploadImage() }
         }
     }
 
@@ -71,7 +92,6 @@ class StoryActivity : AppCompatActivity() {
         }
     }
 
-
     private fun showImage() {
         mainViewModel.currentImageUri.observe(this) {
             binding.rvImage.setImageURI(it)
@@ -80,18 +100,15 @@ class StoryActivity : AppCompatActivity() {
 
     private fun startCamera() {
         mainViewModel.saveUri(getImageUri(this))
-        val uri = mainViewModel.currentImageUri.value
-        if (uri != null) {
+        mainViewModel.currentImageUri.value?.let { uri ->
             launcherIntentCamera.launch(uri)
-        } else {
-            showToast("Failed to create URI for camera")
-        }
+        } ?: showToast("Failed to create URI for camera")
     }
 
     private fun uploadImage() {
         val uri = mainViewModel.currentImageUri.value
         if (uri != null) {
-            val imageFile = uriToFile(uri, this)
+            val imageFile = uriToFile(uri, this).reduceFileImage()
             val description = binding.edAddDescription.text.toString()
 
             val requestBody = description.toRequestBody("text/plain".toMediaType())
@@ -103,21 +120,10 @@ class StoryActivity : AppCompatActivity() {
             )
 
             mainViewModel.uploadStory(multipartBody, requestBody)
-
-            // Observasi apakah upload berhasil, lalu pindah ke MainActivity
-            mainViewModel.isUploadSuccessful.observe(this) { isSuccessful ->
-                if (isSuccessful) {
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-                }
-            }
         } else {
             showToast(getString(R.string.empty_image_warning))
         }
     }
-
-
 
     private val launcherIntentCamera = registerForActivityResult(
         ActivityResultContracts.TakePicture()
@@ -129,11 +135,12 @@ class StoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun showLoading(isLoading: Boolean) {
-//        binding.progressIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
-    }
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.isVisible = isLoading
     }
 }
 

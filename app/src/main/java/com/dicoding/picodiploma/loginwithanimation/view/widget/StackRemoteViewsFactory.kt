@@ -21,13 +21,12 @@ internal class StackRemoteViewsFactory(
     private var storiesList: List<ListStoryItem> = listOf()
 
     override fun onCreate() {
-        // Inisialisasi data di onCreate
+        // Tidak ada
     }
 
     override fun onDataSetChanged() {
         mWidgetItems.clear()
 
-        // Mendapatkan data cerita dari repository
         runBlocking {
             val result = repository.getStories()
             result.onSuccess {
@@ -37,7 +36,6 @@ internal class StackRemoteViewsFactory(
             }
         }
 
-        // Mendownload dan mengonversi setiap gambar cerita menjadi Bitmap
         storiesList.forEach { story ->
             val bitmap = getBitmapFromURL(story.photoUrl) ?:
             BitmapFactory.decodeResource(mContext.resources, R.drawable.baseline_image_24)
@@ -55,7 +53,6 @@ internal class StackRemoteViewsFactory(
         val rv = RemoteViews(mContext.packageName, R.layout.widget_item)
         rv.setImageViewBitmap(R.id.imageView, mWidgetItems[position])
 
-        // Optional: tambahkan intent pada item widget jika diperlukan
         val fillInIntent = Intent()
         rv.setOnClickFillInIntent(R.id.imageView, fillInIntent)
 

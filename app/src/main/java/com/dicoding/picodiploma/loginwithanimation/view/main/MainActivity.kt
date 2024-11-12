@@ -16,6 +16,7 @@ import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityMainBindi
 import com.dicoding.picodiploma.loginwithanimation.view.detail.DetailActivity
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginActivity
 import com.dicoding.picodiploma.loginwithanimation.view.story.StoryActivity
+import com.dicoding.picodiploma.loginwithanimation.view.welcome.WelcomeActivity
 import com.dicoding.picodiploma.loginwithanimation.viewModel.MainViewModel
 import com.dicoding.picodiploma.loginwithanimation.viewModel.StoryAdapter
 import com.dicoding.picodiploma.loginwithanimation.viewModel.ViewModelFactory
@@ -30,38 +31,57 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        setupRecyclerView()
-        setupAdapter()
-        observeViewModel()
-        setupAction()
-        storyAction()
-        languageSetup()
+        mainViewModel.getSession().observe(this) { user ->
+            if (user == null ||  user.token.isEmpty()) {
+                navigateToWelcome()
+            } else {
+                binding = ActivityMainBinding.inflate(layoutInflater)
+                setContentView(binding.root)
+                setupRecyclerView()
+                setupAdapter()
+                observeViewModel()
+                setupAction()
+                storyAction()
+                languageSetup()
+            }
+        }
+    }
+
+    private fun navigateToWelcome() {
+        Intent(this, WelcomeActivity::class.java).also {
+            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(it)
+            finish()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        mainViewModel.listStoryEvents()
+        mainViewModel.loadStories()
     }
 
     private fun observeViewModel() {
-        mainViewModel.let { model ->
-            model.storyEvent.observe(this) { listStory ->
-                setStoryEvent(listStory)
-                model.clearErrorMessage()
-            }
+        mainViewModel.storyEvent.observe(this) { listStory ->
+            setStoryEvent(listStory)
+            mainViewModel.clearErrorMessage()
+        }
 
-            model.isLoading.observe(this) {
-                showLoading(it)
-            }
+        mainViewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
 
-            model.errorMessage.observe(this) { errorMessage ->
-                if (errorMessage != null) {
-                    Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-                    mainViewModel.clearErrorMessage()
-                }
+        mainViewModel.errorMessage.observe(this) { errorMessage ->
+            errorMessage?.let {
+                showToast(it)
+                mainViewModel.clearErrorMessage()
+            }
+        }
+
+        mainViewModel.isLoggedOut.observe(this) { isLoggedOut ->
+            if (isLoggedOut) {
+                showToast("Logout successful")
+                navigateToLogin()
             }
         }
     }
@@ -69,9 +89,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupAdapter() {
         adapter = StoryAdapter { story_id ->
             val intent = Intent(this, DetailActivity::class.java).apply {
-                if (story_id != null) {
-                    putExtra("storyId", story_id.toString())
-                }
+                putExtra("storyId", story_id?.toString())
             }
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
             startActivity(intent, options.toBundle())
@@ -81,23 +99,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        binding.apply {
-            val storyEvent = LinearLayoutManager(this@MainActivity)
-            rvStories.layoutManager = storyEvent
-            val itemStoryEvent = DividerItemDecoration(this@MainActivity, storyEvent.orientation)
-            rvStories.addItemDecoration(itemStoryEvent)
+        binding.rvStories.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            addItemDecoration(DividerItemDecoration(this@MainActivity, LinearLayoutManager.VERTICAL))
         }
     }
 
     private fun setupAction() {
         binding.logoutButton.setOnClickListener {
             mainViewModel.logout()
-        }
-
-        mainViewModel.isLoggedOut.observe(this) { isLoggedOut ->
-            if (isLoggedOut) {
-                navigateToLogin()
-            }
         }
     }
 
@@ -109,16 +119,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun storyAction() {
         binding.makeStory.setOnClickListener {
-            val intent = Intent(this, StoryActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, StoryActivity::class.java))
         }
     }
 
     private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()    }
+        Intent(this, LoginActivity::class.java).also {
+            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(it)
+        }
+        finish()
+    }
 
     private fun setStoryEvent(lifeStoryEvent: List<ListStoryItem?>) {
         adapter.submitList(lifeStoryEvent)
@@ -126,5 +137,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
