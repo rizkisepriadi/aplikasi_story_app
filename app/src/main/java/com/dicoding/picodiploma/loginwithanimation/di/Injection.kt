@@ -1,6 +1,7 @@
 package com.dicoding.picodiploma.loginwithanimation.di
 
 import android.content.Context
+import com.dicoding.picodiploma.loginwithanimation.data.AuthRepository
 import com.dicoding.picodiploma.loginwithanimation.data.UserRepository
 import com.dicoding.picodiploma.loginwithanimation.data.api.ApiConfig
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
@@ -9,10 +10,18 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 object Injection {
-    fun provideRepository(context: Context): UserRepository {
-        val pref = UserPreference.getInstance(context.dataStore)
-        val user = runBlocking { pref.getUser().first() }
-        val apiService = ApiConfig.getApiService(user.token)
-        return UserRepository.getInstance(pref, apiService)
+    fun provideAuthRepository(context: Context): AuthRepository {
+        val userPreference = UserPreference.getInstance(context.dataStore)
+        val authApiService = ApiConfig.getAuthApiService()
+        return AuthRepository.getInstance(userPreference, authApiService)
+    }
+
+    fun provideUserRepository(context: Context): UserRepository {
+        val userPreference = UserPreference.getInstance(context.dataStore)
+        val token = runBlocking {
+            userPreference.getSession().first().token
+        }
+        val userApiService = ApiConfig.getApiService(token)
+        return UserRepository.getInstance(userPreference, userApiService)
     }
 }

@@ -13,12 +13,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivitySignupBinding
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginActivity
+import com.dicoding.picodiploma.loginwithanimation.viewModel.LoginViewModel
 import com.dicoding.picodiploma.loginwithanimation.viewModel.MainViewModel
 import com.dicoding.picodiploma.loginwithanimation.viewModel.ViewModelFactory
 
 class SignupActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupBinding
-    private val mainViewModel: MainViewModel by viewModels {
+    private val mainViewModel: LoginViewModel by viewModels {
         ViewModelFactory.getInstance(this) as ViewModelProvider.Factory
     }
 

@@ -1,12 +1,12 @@
 package com.dicoding.picodiploma.loginwithanimation.data
 
 import android.util.Log
+import com.dicoding.picodiploma.loginwithanimation.data.api.ApiConfig
 import com.dicoding.picodiploma.loginwithanimation.data.api.ApiService
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.dicoding.picodiploma.loginwithanimation.data.response.FileUploadResponse
 import com.dicoding.picodiploma.loginwithanimation.data.response.ListStoryItem
-import com.dicoding.picodiploma.loginwithanimation.data.response.LoginResult
 import com.dicoding.picodiploma.loginwithanimation.data.response.Story
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
@@ -14,30 +14,8 @@ import okhttp3.RequestBody
 
 class UserRepository private constructor(
     private val userPreference: UserPreference,
-    private val apiService: ApiService
+    private var apiService: ApiService
 ) {
-    suspend fun register(name: String, email: String, password: String): Result<Unit> {
-        return try {
-            apiService.register(name, email, password)
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun login(email: String, password: String): Result<LoginResult> {
-        return try {
-            val response = apiService.login(email, password)
-            if (!response.error) {
-                Result.success(response.loginResult)
-            } else {
-                Result.failure(Exception(response.message))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     suspend fun getStories(): Result<List<ListStoryItem>> {
         return try {
             val response = apiService.getStories()
@@ -77,7 +55,6 @@ class UserRepository private constructor(
     ): Result<FileUploadResponse> {
         return try {
             val response = apiService.uploadStory(multipartBody, requestBody)
-
             if (!response.error) {
                 Log.d("UploadStory", "Upload success: ${response.message}")
                 Result.success(response)
@@ -91,9 +68,10 @@ class UserRepository private constructor(
         }
     }
 
-    suspend fun saveSession(user: UserModel) {
-        userPreference.saveSession(user)
+    fun updateApiService(token: String) {
+        apiService = ApiConfig.getApiService(token)
     }
+
 
     fun getSession(): Flow<UserModel> {
         return userPreference.getSession()
@@ -106,6 +84,7 @@ class UserRepository private constructor(
     companion object {
         @Volatile
         private var instance: UserRepository? = null
+
         fun getInstance(
             userPreference: UserPreference,
             apiService: ApiService
@@ -114,5 +93,4 @@ class UserRepository private constructor(
                 instance ?: UserRepository(userPreference, apiService)
             }.also { instance = it }
     }
-
 }

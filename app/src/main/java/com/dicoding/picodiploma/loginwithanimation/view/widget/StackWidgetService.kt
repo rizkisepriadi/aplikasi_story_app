@@ -3,11 +3,12 @@ package com.dicoding.picodiploma.loginwithanimation.view.widget
 import StackRemoteViewsFactory
 import android.content.Intent
 import android.widget.RemoteViewsService
-import com.dicoding.picodiploma.loginwithanimation.viewModel.ViewModelFactory
+import com.dicoding.picodiploma.loginwithanimation.data.UserRepository
+import com.dicoding.picodiploma.loginwithanimation.di.Injection
 
 class StackWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        val userRepository = ViewModelFactory.getInstance(applicationContext).repository
+        val userRepository: UserRepository = Injection.provideUserRepository(applicationContext)
 
         return StackRemoteViewsFactory(this.applicationContext, userRepository)
     }

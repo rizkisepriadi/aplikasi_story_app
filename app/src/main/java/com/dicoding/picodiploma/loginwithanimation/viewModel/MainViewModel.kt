@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.dicoding.picodiploma.loginwithanimation.data.AuthRepository
 import com.dicoding.picodiploma.loginwithanimation.data.UserRepository
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
 import com.dicoding.picodiploma.loginwithanimation.data.response.ListStoryItem
@@ -14,16 +15,13 @@ import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
-class MainViewModel(private val repository: UserRepository) : ViewModel() {
+class MainViewModel(private val repository: UserRepository, authRepository: AuthRepository) : ViewModel() {
     fun getSession(): LiveData<UserModel> {
         return repository.getSession().asLiveData()
     }
 
     private val _currentImageUri = MutableLiveData<Uri?>()
     val currentImageUri: LiveData<Uri?> = _currentImageUri
-
-    private val _isRegisterSuccessful = MutableLiveData<Boolean>()
-    val isRegisterSuccessful: LiveData<Boolean> get() = _isRegisterSuccessful
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
@@ -42,22 +40,6 @@ class MainViewModel(private val repository: UserRepository) : ViewModel() {
 
     private val _isLoggedOut = MutableLiveData<Boolean>()
     val isLoggedOut: LiveData<Boolean> = _isLoggedOut
-
-    fun register(name: String, email: String, password: String) {
-        _isLoading.value = true
-        viewModelScope.launch {
-            val result = repository.register(name, email, password)
-
-            result.onSuccess {
-                _isRegisterSuccessful.value = true
-                _isLoading.value = false
-                clearErrorMessage()
-            }.onFailure {
-                _isRegisterSuccessful.value = false
-                _errorMessage.value = it.message
-            }
-        }
-    }
 
     fun loadStories() {
         _isLoading.value = true
