@@ -11,10 +11,10 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.dicoding.picodiploma.loginwithanimation.data.response.ListStoryItem
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityMainBinding
 import com.dicoding.picodiploma.loginwithanimation.view.detail.DetailActivity
 import com.dicoding.picodiploma.loginwithanimation.view.login.LoginActivity
+import com.dicoding.picodiploma.loginwithanimation.view.map.MapsActivity
 import com.dicoding.picodiploma.loginwithanimation.view.story.StoryActivity
 import com.dicoding.picodiploma.loginwithanimation.view.welcome.WelcomeActivity
 import com.dicoding.picodiploma.loginwithanimation.viewModel.MainViewModel
@@ -32,20 +32,20 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         mainViewModel.getSession().observe(this) { user ->
-            if (user == null ||  user.token.isEmpty()) {
+            if (user == null || user.token.isEmpty()) {
                 navigateToWelcome()
-            } else {
-                binding = ActivityMainBinding.inflate(layoutInflater)
-                setContentView(binding.root)
-                setupRecyclerView()
-                setupAdapter()
-                observeViewModel()
-                setupAction()
-                storyAction()
-                languageSetup()
             }
         }
+
+        setupRecyclerView()
+        setupAdapter()
+
+        observeViewModel()
+        setupAction()
     }
 
     private fun navigateToWelcome() {
@@ -56,15 +56,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        mainViewModel.loadStories()
-    }
-
     private fun observeViewModel() {
-        mainViewModel.storyEvent.observe(this) { listStory ->
-            setStoryEvent(listStory)
-            mainViewModel.clearErrorMessage()
+        mainViewModel.loadStories.observe(this) {
+            adapter.submitData(lifecycle, it)
         }
 
         mainViewModel.isLoading.observe(this) { isLoading ->
@@ -87,21 +81,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupAdapter() {
-        adapter = StoryAdapter { story_id ->
+        adapter = StoryAdapter { storyId ->
             val intent = Intent(this, DetailActivity::class.java).apply {
-                putExtra("storyId", story_id?.toString())
+                putExtra("storyId", storyId)
             }
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
             startActivity(intent, options.toBundle())
         }
-
         binding.rvStories.adapter = adapter
     }
 
     private fun setupRecyclerView() {
         binding.rvStories.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            addItemDecoration(DividerItemDecoration(this@MainActivity, LinearLayoutManager.VERTICAL))
+            addItemDecoration(
+                DividerItemDecoration(this@MainActivity, LinearLayoutManager.VERTICAL)
+            )
         }
     }
 
@@ -109,15 +104,15 @@ class MainActivity : AppCompatActivity() {
         binding.logoutButton.setOnClickListener {
             mainViewModel.logout()
         }
-    }
 
-    private fun languageSetup() {
         binding.settingImageView.setOnClickListener {
             startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
         }
-    }
 
-    private fun storyAction() {
+        binding.MapView.setOnClickListener {
+            startActivity(Intent(this, MapsActivity::class.java))
+        }
+
         binding.makeStory.setOnClickListener {
             startActivity(Intent(this, StoryActivity::class.java))
         }
@@ -129,10 +124,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(it)
         }
         finish()
-    }
-
-    private fun setStoryEvent(lifeStoryEvent: List<ListStoryItem?>) {
-        adapter.submitList(lifeStoryEvent)
     }
 
     private fun showLoading(isLoading: Boolean) {

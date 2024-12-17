@@ -37,7 +37,10 @@ class AuthRepository(
                 val userModel = UserModel(email, loginResult.token, true)
                 saveSession(userModel)
 
-                UserRepository.getInstance(userPreference, ApiConfig.getApiService(loginResult.token))
+                UserRepository.getInstance(
+                    userPreference,
+                    ApiConfig.getApiService(loginResult.token)
+                )
                     .updateApiService(loginResult.token)
 
                 Result.success(loginResult)

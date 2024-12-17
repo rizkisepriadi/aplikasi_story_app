@@ -2,6 +2,8 @@ package com.dicoding.picodiploma.loginwithanimation.data.response
 
 import kotlinx.parcelize.Parcelize
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 @Parcelize
@@ -17,6 +19,7 @@ data class StoryResponse(
 	val message: String
 ) : Parcelable
 
+@Entity(tableName = "story")
 @Parcelize
 data class ListStoryItem(
 
@@ -35,6 +38,7 @@ data class ListStoryItem(
 	@field:SerializedName("lon")
 	val lon: Double,
 
+	@PrimaryKey
 	@field:SerializedName("id")
 	val id: String,
 

@@ -2,15 +2,15 @@ package com.dicoding.picodiploma.loginwithanimation.viewModel
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dicoding.picodiploma.loginwithanimation.data.response.ListStoryItem
 import com.dicoding.picodiploma.loginwithanimation.databinding.ItemEventBinding
 
 class StoryAdapter(private val onItemClick: ((String?) -> Unit)? = null) :
-    ListAdapter<ListStoryItem, StoryAdapter.StoryEventViewHolder>(DIFF_CALLBACK) {
+    PagingDataAdapter<ListStoryItem, StoryAdapter.StoryEventViewHolder>(DIFF_CALLBACK) {
 
     class StoryEventViewHolder(
         private val binding: ItemEventBinding,
@@ -32,7 +32,7 @@ class StoryAdapter(private val onItemClick: ((String?) -> Unit)? = null) :
     }
 
     override fun onBindViewHolder(holder: StoryEventViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        getItem(position)?.let { holder.bind(it) }
     }
 
     companion object {

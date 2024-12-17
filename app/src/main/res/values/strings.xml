@@ -26,4 +26,6 @@
     <string name="description">Deskripsi</string>
     <string name="gallery">Galeri</string>
     <string name="camera">Kamera</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="location">Tambahkan Lokasi Saya</string>
 </resources>

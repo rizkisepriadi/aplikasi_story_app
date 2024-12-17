@@ -4,6 +4,7 @@ import android.content.Context
 import com.dicoding.picodiploma.loginwithanimation.data.AuthRepository
 import com.dicoding.picodiploma.loginwithanimation.data.UserRepository
 import com.dicoding.picodiploma.loginwithanimation.data.api.ApiConfig
+import com.dicoding.picodiploma.loginwithanimation.data.database.StoryDatabase
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.dicoding.picodiploma.loginwithanimation.data.pref.dataStore
 import kotlinx.coroutines.flow.first
@@ -22,6 +23,7 @@ object Injection {
             userPreference.getSession().first().token
         }
         val userApiService = ApiConfig.getApiService(token)
-        return UserRepository.getInstance(userPreference, userApiService)
+        val database = StoryDatabase.getDatabase(context)
+        return UserRepository.getInstance(userPreference, userApiService, database)
     }
 }
